@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>NusaWebGame — Buat Game & Aplikasi Tanpa Coding</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/lucide@1/dist/umd/lucide.min.js"></script>
+<style>
+:root{
+  --bg:#202024; --card:#2a2a2f; --card2:#333338; --text:#e8e5df; --muted:#9a978f;
+  --accent:#c47046; --accent-soft:rgba(196,112,70,.14); --accent2:#7ba8b8; --accent2-soft:rgba(123,168,184,.14);
+  --border:rgba(232,229,223,.12); --gold:#facc15; --green:#4ade80; --red:#f87171;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:'Red Hat Display',system-ui,sans-serif; color:var(--text);
+  background:
+    radial-gradient(1100px 520px at 85% -8%, rgba(123,168,184,.12), transparent 60%),
+    radial-gradient(900px 480px at -10% 18%, rgba(196,112,70,.10), transparent 60%),
+    var(--bg);
+  min-height:100vh;
+}
+.hidden{display:none!important}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,textarea{font-family:inherit}
+
+/* ---------- Intro loader ---------- */
+#intro{
+  position:fixed;inset:0;z-index:60;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:24px;
+  transition:opacity .45s ease;
+}
+#intro.done{opacity:0;pointer-events:none}
+.intro-logo{width:84px;height:84px}
+#introTitle{font-size:clamp(1.5rem,5vw,2.2rem);font-weight:800;text-align:center;letter-spacing:.3px}
+.dots{display:inline-block;min-width:1.4em;text-align:left}
+.dots span{animation:blink 1.2s infinite}
+.dots span:nth-child(2){animation-delay:.2s}
+.dots span:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.15}40%{opacity:1}}
+.intro-bar{width:min(320px,80vw);height:8px;border-radius:99px;background:var(--card2);overflow:hidden}
+.intro-bar i{display:block;height:100%;width:0%;border-radius:99px;background:linear-gradient(90deg,var(--accent2),var(--accent));transition:width .18s linear}
+#introPct{color:var(--muted);font-size:.9rem;font-variant-numeric:tabular-nums}
+#introNote{color:var(--muted);font-size:.85rem}
+
+/* ---------- Shell ---------- */
+#app{max-width:720px;margin:0 auto;padding:0 16px 110px}
+.app-hidden{display:none}
+header.topbar{
+  position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;
+  padding:14px 4px 12px;gap:10px;
+  background:linear-gradient(var(--bg) 78%,transparent);
+}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-mark{width:38px;height:38px;border-radius:11px;background:var(--accent-soft);border:1px solid var(--accent);display:grid;place-items:center;color:var(--accent)}
+.brand-name{font-weight:800;font-size:1.05rem;line-height:1.1}
+.brand-sub{font-size:.7rem;color:var(--muted)}
+.top-actions{display:flex;align-items:center;gap:8px}
+.coin-chip{display:flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--border);border-radius:99px;padding:6px 12px 6px 8px;font-weight:700;font-variant-numeric:tabular-nums}
+.badge-pro{display:flex;align-items:center;gap:5px;border-radius:99px;padding:6px 11px;font-size:.72rem;font-weight:800;letter-spacing:.6px}
+.badge-pro.gold{background:linear-gradient(135deg,rgba(250,204,21,.22),rgba(123,168,184,.22));border:1px solid var(--gold);color:var(--gold)}
+.badge-pro.free{background:var(--card);border:1px solid var(--border);color:var(--muted)}
+
+.page{display:none;animation:fadeIn .28s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ---------- Cards & sections ---------- */
+.section{margin-top:22px}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.section-head h2{font-size:1.05rem;font-weight:700;display:flex;align-items:center;gap:8px}
+.section-head h2 i{width:18px;height:18px;color:var(--accent2)}
+.section-head .hint{font-size:.75rem;color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:14px}
+.eyebrow{font-size:.72rem;text-transform:uppercase;letter-spacing:1.4px;color:var(--accent2);font-weight:700;margin-bottom:6px}
+
+/* ---------- Mode tabs ---------- */
+.mode-tabs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.mode-tab{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:15px;border-radius:15px;background:var(--card);border:1px solid var(--border);text-align:left;transition:border-color .2s,transform .15s}
+.mode-tab i{width:24px;height:24px}
+.mode-tab .mt-title{font-weight:700;font-size:.95rem}
+.mode-tab .mt-sub{font-size:.75rem;color:var(--muted)}
+.mode-tab.active{border-color:var(--accent);background:var(--accent-soft)}
+.mode-tab:active{transform:scale(.985)}
+
+/* ---------- Forms ---------- */
+label.field-label{display:block;font-size:.82rem;font-weight:600;color:var(--muted);margin:12px 0 6px}
+textarea,#codeInput,#codeEditor,input.text{
+  width:100%;background:var(--bg);border:1px solid var(--border);border-radius:12px;color:var(--text);
+  padding:12px;font-size:.92rem;resize:vertical;outline:none;
+}
+textarea:focus,#codeEditor:focus,input.text:focus{border-color:var(--accent2)}
+#codeEditor{min-height:180px;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;font-size:.82rem;line-height:1.5}
+textarea{min-height:96px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:8px 13px;border-radius:99px;border:1px solid var(--border);background:var(--card2);font-size:.8rem;color:var(--muted)}
+.chip.active{border-color:var(--accent);color:var(--text);background:var(--accent-soft);font-weight:600}
+.swatches{display:flex;gap:10px;flex-wrap:wrap}
+.swatch{width:30px;height:30px;border-radius:50%;border:2px solid transparent}
+.swatch.active{border-color:var(--text);transform:scale(1.1)}
+
+/* ---------- Buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:12px;padding:12px 18px;font-weight:700;font-size:.92rem;transition:transform .15s,opacity .2s}
+.btn:active{transform:scale(.98)}
+.btn i{width:17px;height:17px}
+.btn.primary{background:var(--accent);color:#fff}
+.btn.primary:disabled{opacity:.45;cursor:not-allowed}
+.btn.secondary{background:var(--card2);border:1px solid var(--border);color:var(--text)}
+.btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}
+.btn.accent2{background:var(--accent2-soft);border:1px solid var(--accent2);color:var(--text)}
+.btn.wide{width:100%}
+.btn.small{padding:8px 12px;font-size:.8rem;border-radius:10px}
+.btn-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+
+/* ---------- Progress ---------- */
+.progress-wrap{margin-top:14px;padding:14px;border:1px solid var(--border);border-radius:14px;background:var(--bg)}
+.progress-meta{display:flex;justify-content:space-between;font-size:.8rem;color:var(--muted);margin-bottom:8px}
+.progress-track{height:10px;border-radius:99px;background:var(--card2);overflow:hidden}
+.progress-track i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:99px}
+.progress-status{margin-top:10px;font-size:.84px;color:var(--text)}
+.result-box{margin-top:14px;padding:14px;border:1px solid var(--accent2);border-radius:14px;background:var(--accent2-soft)}
+.result-link{font-family:ui-monospace,Menlo,monospace;font-size:.78rem;word-break:break-all;color:var(--accent2)}
+
+/* ---------- Preview iframe ---------- */
+.preview-frame{width:100%;height:260px;border:1px solid var(--border);border-radius:12px;background:#fff;margin-top:10px}
+.code-status{font-size:.78rem;color:var(--muted);margin-top:8px}
+.code-status.ok{color:var(--green)}
+.code-status.warn{color:var(--gold)}
+.code-status.bad{color:var(--red)}
+
+/* ---------- Wallet ---------- */
+.balance-hero{display:flex;align-items:center;gap:14px}
+.balance-hero .coin-big{width:56px;height:56px}
+.balance-num{font-size:1.8rem;font-weight:800;font-variant-numeric:tabular-nums}
+.pkg-grid{display:grid;gap:12px}
+.pkg{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:15px;position:relative;overflow:hidden}
+.pkg.featured{border-color:var(--gold)}
+.pkg .pkg-name{font-weight:800;font-size:.98rem;display:flex;align-items:center;gap:8px}
+.pkg .pkg-stars{font-size:1.3rem;font-weight:800;margin:6px 0 2px}
+.pkg .pkg-price{color:var(--accent2);font-weight:700;font-size:.95rem}
+.pkg .pkg-note{font-size:.74rem;color:var(--muted);margin-top:6px;line-height:1.45}
+.pkg .pkg-quota{font-size:.74rem;color:var(--gold);margin-top:6px}
+.pkg .pkg-quota.done{color:var(--red)}
+.flag{position:absolute;top:12px;right:12px;font-size:.66rem;font-weight:800;padding:3px 8px;border-radius:99px;background:var(--accent-soft);color:var(--accent)}
+.redeem-row{display:flex;gap:8px;margin-top:10px}
+.redeem-row input{flex:1}
+.claim-row{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+
+/* ---------- Games gallery ---------- */
+.game-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.game-card{background:var(--card);border:1px solid var(--border);border-radius:15px;padding:14px;display:flex;flex-direction:column;gap:8px;transition:transform .15s,border-color .2s}
+.game-card:active{transform:scale(.98)}
+.game-card .g-icon{width:38px;height:38px;border-radius:11px;background:var(--accent2-soft);color:var(--accent2);display:grid;place-items:center}
+.game-card .g-icon i{width:20px;height:20px}
+.game-card .g-name{font-weight:700;font-size:.88rem}
+.game-card .g-desc{font-size:.72rem;color:var(--muted);line-height:1.4;flex:1}
+.game-card .g-meta{font-size:.7rem;color:var(--accent2);font-weight:600}
+.game-actions{display:flex;gap:8px;margin-top:4px}
+.game-actions .btn{flex:1;padding:8px 10px;font-size:.76rem}
+
+/* ---------- How it works ---------- */
+.steps{list-style:none;margin-top:8px}
+.steps li{display:flex;gap:12px;padding:9px 0;border-bottom:1px solid var(--border);font-size:.85rem;color:var(--muted)}
+.steps li:last-child{border-bottom:none}
+.steps li b{color:var(--text)}
+.step-num{flex:0 0 26px;height:26px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-weight:800;font-size:.78rem}
+
+/* ---------- Bottom nav ---------- */
+#bottomnav{position:fixed;left:0;right:0;bottom:0;z-index:30;max-width:720px;margin:0 auto;
+  display:grid;grid-template-columns:1fr 1fr 1fr;background:rgba(42,42,47,.92);backdrop-filter:blur(10px);
+  border-top:1px solid var(--border);padding:8px 6px calc(8px + env(safe-area-inset-bottom));}
+.nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;color:var(--muted);font-size:.68rem;font-weight:600}
+.nav-btn i{width:21px;height:21px}
+.nav-btn.active{color:var(--accent2)}
+
+/* ---------- History ---------- */
+.hist-item{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:13px 14px;margin-bottom:10px}
+.hist-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.hist-title{font-weight:700;font-size:.88rem;word-break:break-word}
+.hist-meta{font-size:.74rem;color:var(--muted);margin-top:4px;display:flex;flex-wrap:wrap;gap:10px}
+.tag{font-size:.68rem;font-weight:700;padding:3px 8px;border-radius:99px}
+.tag.ai{background:var(--accent-soft);color:var(--accent)}
+.tag.code{background:var(--accent2-soft);color:var(--accent2)}
+.empty{text-align:center;color:var(--muted);padding:34px 16px;font-size:.85rem}
+.empty i{width:34px;height:34px;margin-bottom:10px;opacity:.6}
+
+/* ---------- Profile ---------- */
+.profile-head{display:flex;align-items:center;gap:16px}
+.avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--accent2),var(--accent));display:grid;place-items:center;font-size:1.5rem;font-weight:800;color:#fff;flex:0 0 auto}
+.p-name{font-size:1.15rem;font-weight:800}
+.p-since{font-size:.74rem;color:var(--muted);margin-top:3px}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.stat{background:var(--bg);border:1px solid var(--border);border-radius:13px;padding:12px}
+.stat dt{font-size:.7rem;color:var(--muted)}
+.stat dd{font-size:1.15rem;font-weight:800;margin-top:4px;font-variant-numeric:tabular-nums}
+
+/* ---------- Modal ---------- */
+.modal{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.62);display:flex;align-items:center;justify-content:center;padding:16px}
+.modal-box{width:100%;max-width:480px;max-height:88vh;overflow:auto;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:18px}
+.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.modal-head h3{font-size:1.05rem;display:flex;align-items:center;gap:9px}
+.modal-close{width:32px;height:32px;border-radius:10px;background:var(--card2);display:grid;place-items:center;color:var(--muted)}
+.modal-close i{width:17px;height:17px}
+pre.code-sample{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:12px;font-size:.74rem;overflow:auto;color:var(--accent2);line-height:1.55}
+
+/* ---------- Games inside modal ---------- */
+.game-stage{display:flex;flex-direction:column;align-items:center;gap:14px}
+.game-screen-start{text-align:center;padding:10px 0}
+.game-screen-start .g-big{width:58px;height:58px;border-radius:16px;background:var(--accent2-soft);color:var(--accent2);display:grid;place-items:center;margin:0 auto 12px}
+.game-screen-start .g-big i{width:28px;height:28px}
+.game-hud{display:flex;gap:18px;font-size:.82rem;color:var(--muted);width:100%;justify-content:center}
+.game-hud b{color:var(--text);font-variant-numeric:tabular-nums}
+.ttt-board{display:grid;grid-template-columns:repeat(3,74px);gap:8px}
+.ttt-cell{width:74px;height:74px;border-radius:14px;background:var(--bg);border:1px solid var(--border);font-size:1.9rem;font-weight:800;display:grid;place-items:center}
+.ttt-cell.win{background:var(--accent-soft);border-color:var(--accent)}
+.dice-row{display:flex;gap:26px;align-items:center}
+.dice{width:74px;height:74px;border-radius:16px;background:var(--bg);border:1px solid var(--border);display:grid;place-items:center;font-size:2rem;font-weight:800}
+.dice.rolling{animation:shake .5s}
+@keyframes shake{0%,100%{transform:rotate(0)}25%{transform:rotate(-14deg)}75%{transform:rotate(14deg)}}
+.mem-grid{display:grid;grid-template-columns:repeat(4,58px);gap:8px}
+.mem-card{width:58px;height:58px;border-radius:12px;background:var(--bg);border:1px solid var(--border);font-size:1.25rem;font-weight:800;color:transparent;transition:transform .2s}
+.mem-card.flipped{color:var(--text);background:var(--card2)}
+.mem-card.matched{background:var(--accent-soft);border-color:var(--accent);color:var(--gold)}
+#snakeCanvas{background:var(--bg);border:1px solid var(--border);border-radius:14px;touch-action:none}
+.dpad{display:grid;grid-template-columns:repeat(3,54px);gap:6px;justify-content:center}
+.dpad button{height:44px;border-radius:12px;background:var(--card2);border:1px solid var(--border);display:grid;place-items:center}
+.dpad button i{width:20px;height:20px}
+
+/* ---------- Toast ---------- */
+#toastRoot{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:80;display:flex;flex-direction:column;gap:8px;width:min(92vw,420px)}
+.toast{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;font-size:.84rem;box-shadow:0 10px 30px rgba(0,0,0,.35);animation:toastIn .25s ease}
+.toast.ok{border-color:var(--green)}
+.toast.err{border-color:var(--red)}
+@keyframes toastIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+
+footer{text-align:center;color:var(--muted);font-size:.72rem;padding:26px 10px 8px;line-height:1.6}
+</style>
+</head>
+<body>
+
+<!-- ================= INTRO ================= -->
+<div id="intro">
+  <svg class="intro-logo" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <rect x="4" y="10" width="40" height="28" rx="10" stroke="#7ba8b8" stroke-width="2.5"/>
+    <path d="M14 19v10M9 24h10" stroke="#c47046" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="32" cy="21" r="2.2" fill="#facc15"/>
+    <circle cx="37" cy="27" r="2.2" fill="#facc15"/>
+  </svg>
+  <div id="introTitle"></div>
+  <div class="intro-bar"><i id="introBar"></i></div>
+  <div id="introPct">0%</div>
+  <div id="introNote">Menyiapkan studio kreator NusaWebGame...</div>
+</div>
+
+<!-- ================= APP ================= -->
+<div id="app" class="app-hidden">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark"><i data-lucide="gamepad-2"></i></div>
+      <div>
+        <div class="brand-name">NusaWebGame</div>
+        <div class="brand-sub">Studio Kreator Tanpa Coding</div>
+      </div>
+    </div>
+    <div class="top-actions">
+      <div class="coin-chip" id="headerCoin"></div>
+      <div id="headerBadge"></div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ BERANDA ============ -->
+    <section class="page active" id="page-beranda">
+
+      <div class="card" style="margin-top:14px">
+        <div class="eyebrow">Selamat datang di studio</div>
+        <h1 style="font-size:1.35rem;font-weight:800" id="greetName">Halo, Teman Kreator</h1>
+        <p style="color:var(--muted);font-size:.86rem;margin-top:6px;line-height:1.55">
+          Buat game dan aplikasi tanpa menulis kode, atau tempel kodemu sendiri dan langsung terbitkan.
+          Semua hasil tersimpan di Riwayat dan bisa dibagikan lewat link.
+        </p>
+      </div>
+
+      <!-- Mode tabs -->
+      <div class="section">
+        <div class="mode-tabs">
+          <button class="mode-tab active" data-mode="tanpa">
+            <i data-lucide="wand-sparkles"></i>
+            <span class="mt-title">Tanpa Coding</span>
+            <span class="mt-sub">Cukup ceritakan ide, AI yang menulis kode</span>
+          </button>
+          <button class="mode-tab" data-mode="dengan">
+            <i data-lucide="code-2"></i>
+            <span class="mt-title">Dengan Coding</span>
+            <span class="mt-sub">Editor kode, pratinjau langsung, terbitkan</span>
+          </button>
+        </div>
+
+        <!-- Panel tanpa coding -->
+        <div class="card" id="panelTanpa">
+          <div class="eyebrow">Generator AI</div>
+          <label class="field-label" for="descInput">Ceritakan game atau aplikasi yang kamu mau</label>
+          <textarea id="descInput" placeholder="Contoh: Buatkan saya game 3D sederhana mobil mengumpulkan koin dan menghindari rintangan..."></textarea>
+
+          <label class="field-label">Tingkat kesulitan (memengaruhi estimasi waktu)</label>
+          <div class="chips" id="diffChips">
+            <button class="chip active" data-diff="simple">Sederhana · 1–3 menit</button>
+            <button class="chip" data-diff="medium">Sedang / 3D · 3–7 menit</button>
+            <button class="chip" data-diff="complex">Kompleks · 7–15 menit</button>
+          </div>
+
+          <label class="field-label">Pilih tema warna awal</label>
+          <div class="swatches" id="themeSwatches">
+            <button class="swatch active" data-theme="#2563ab" style="background:#2563ab" aria-label="Biru"></button>
+            <button class="swatch" data-theme="#7c3aed" style="background:#7c3aed" aria-label="Ungu"></button>
+            <button class="swatch" data-theme="#16a34a" style="background:#16a34a" aria-label="Hijau"></button>
+            <button class="swatch" data-theme="#ea580c" style="background:#ea580c" aria-label="Oranye"></button>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn primary" id="btnGenerate"><i data-lucide="sparkles"></i> Buat dengan AI · 15 Bintang</button>
+          </div>
+
+          <div class="progress-wrap hidden" id="genProgress">
+            <div class="progress-meta"><span id="genEstimate">Menyiapkan generator...</span><span id="genPct">0%</span></div>
+            <div class="progress-track"><i id="genBar"></i></div>
+            <div class="progress-status" id="genStatus">AI sedang menulis kode...</div>
+          </div>
+
+          <div class="result-box hidden" id="genResult">
+            <div style="font-weight:700;font-size:.9rem;margin-bottom:6px">Proyek selesai dibuat</div>
+            <div class="result-link" id="genLink"></div>
+            <div class="btn-row">
+              <button class="btn accent2 small" id="btnGenDownload"><i data-lucide="download"></i> Unduh File</button>
+              <button class="btn secondary small" id="btnGenShare"><i data-lucide="share-2"></i> Bagikan</button>
+              <button class="btn ghost small" id="btnGenNew">Buat Baru</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel dengan coding -->
+        <div class="card hidden" id="panelDengan">
+          <div class="eyebrow">Editor Kode</div>
+          <label class="field-label" for="codeEditor">Kode HTML / CSS / JavaScript kamu</label>
+          <textarea id="codeEditor" spellcheck="false"></textarea>
+          <div class="btn-row">
+            <button class="btn secondary small" id="btnPreview"><i data-lucide="eye"></i> Pratinjau</button>
+            <button class="btn secondary small" id="btnCopy"><i data-lucide="copy"></i> Salin</button>
+            <button class="btn secondary small" id="btnCheck"><i data-lucide="shield-check"></i> Cek Kode</button>
+            <button class="btn secondary small" id="btnUpload"><i data-lucide="upload"></i> Upload File</button>
+            <button class="btn primary small" id="btnDeploy"><i data-lucide="rocket"></i> Terbitkan · 15 Bintang</button>
+          </div>
+          <input type="file" id="fileInput" accept=".html,.css,.js,.txt" class="hidden">
+          <div class="code-status" id="codeStatus">Pratinjau akan tampil di bawah setelah kamu tekan Pratinjau.</div>
+          <iframe class="preview-frame" id="codePreview" sandbox="allow-scripts" title="Pratinjau kode"></iframe>
+        </div>
+      </div>
+
+      <!-- ============ KREDIT / PAKET ============ -->
+      <div class="section" id="kredit">
+        <div class="section-head">
+          <h2><i data-lucide="coins"></i> Kredit Bintang & Paket</h2>
+          <span class="hint">15 Bintang = 1 kali buat</span>
+        </div>
+
+        <div class="card balance-hero">
+          <div class="coin-big" id="walletCoin"></div>
+          <div>
+            <div class="eyebrow">Saldo Bintang kamu</div>
+            <div class="balance-num" id="walletStars">0</div>
+            <div style="font-size:.76rem;color:var(--muted)" id="walletStatus"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="eyebrow">Klaim Gratis</div>
+          <div class="claim-row">
+            <button class="btn secondary" id="btnChannelClaim"><i data-lucide="radio-tower"></i> Ikuti Saluran Resmi & Klaim 15 Bintang</button>
+            <button class="btn secondary" id="btnVideo1k"><i data-lucide="video"></i> Klaim Hadiah Video · 1.000 Views (WA Admin)</button>
+            <button class="btn secondary" id="btnVideo15k"><i data-lucide="video"></i> Klaim Hadiah Video · 1.500 Views (WA Admin)</button>
+          </div>
+          <p style="font-size:.74rem;color:var(--muted);margin-top:10px;line-height:1.5">
+            Syarat video: unggah video tentang NusaWebGame dengan judul dan caption yang ditentukan admin.
+            Setelah views mencapai target, kirim tangkapan layar ke WhatsApp admin untuk diklaim.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="eyebrow">Masukkan Kode Pro / Kredit</div>
+          <p style="font-size:.8rem;color:var(--muted)">Tempel kode yang kamu terima dari admin setelah pembelian.</p>
+          <div class="redeem-row">
+            <input class="text" id="codeInput" placeholder="Contoh: NUSA-RIFAL-28-KXQZ" autocomplete="off">
+            <button class="btn primary" id="btnRedeem"><i data-lucide="ticket-check"></i> Aktifkan</button>
+          </div>
+        </div>
+
+        <div class="pkg-grid" id="pkgGrid"></div>
+
+        <div class="card" style="margin-top:14px">
+          <div class="eyebrow">Cara Beli</div>
+          <ol class="steps">
+            <li><span class="step-num">1</span><span>Pilih paket di atas, tekan <b>Beli via WhatsApp</b>.</span></li>
+            <li><span class="step-num">2</span><span>Pesan otomatis terbuka ke nomor admin <b>0821-7611-734</b>.</span></li>
+            <li><span class="step-num">3</span><span>Setelah pembayaran, admin mengirim <b>kode NUSA-RIFAL-...</b>.</span></li>
+            <li><span class="step-num">4</span><span>Masukkan kode di kolom atas → Bintang langsung masuk ke saldo.</span></li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- ============ GAME BAWAAN ============ -->
+      <div class="section">
+        <div class="section-head">
+          <h2><i data-lucide="library-big"></i> Game Bawaan Gratis</h2>
+          <span class="hint">Tanpa potongan Bintang</span>
+        </div>
+        <div class="game-grid" id="gameGrid"></div>
+      </div>
+
+      <!-- Cara kerja -->
+      <div class="section">
+        <div class="card">
+          <div class="eyebrow">Alur Kerja NusaWebGame</div>
+          <ol class="steps">
+            <li><span class="step-num">1</span><span><b>Tanpa Coding:</b> tulis deskripsi → AI menulis kode → tunggu proses → dapat link preview.</span></li>
+            <li><span class="step-num">2</span><span><b>Dengan Coding:</b> tulis atau upload kode → pratinjau → tekan Terbitkan.</span></li>
+            <li><span class="step-num">3</span><span>Unduh file hasil atau bagikan link ke teman kapan saja.</span></li>
+            <li><span class="step-num">4</span><span>Semua proyek tersimpan di menu <b>Riwayat</b>.</span></li>
+          </ol>
+        </div>
+      </div>
+
+      <footer>© 2026 NusaWebGame · Dibuat oleh RIFAL MODS<br>Admin WhatsApp: 0821-7611-734</footer>
+    </section>
+
+    <!-- ============ RIWAYAT ============ -->
+    <section class="page" id="page-riwayat">
+      <div class="section-head" style="margin-top:14px">
+        <h2><i data-lucide="history"></i> Riwayat Proyek</h2>
+        <button class="btn ghost small" id="btnClearHistory"><i data-lucide="trash-2"></i> Bersihkan</button>
+      </div>
+      <div id="historyList"></div>
+    </section>
+
+    <!-- ============ PROFIL ============ -->
+    <section class="page" id="page-profil">
+      <div class="section" style="margin-top:14px">
+        <div class="card">
+          <div class="profile-head">
+            <div class="avatar" id="profAvatar">N</div>
+            <div style="flex:1">
+              <input class="text" id="profName" placeholder="Nama kamu" maxlength="24" style="font-weight:800;font-size:1.05rem;background:transparent;border-color:transparent;padding:6px 4px">
+              <div class="p-since" id="profSince"></div>
+              <div style="margin-top:8px" id="profBadge"></div>
+            </div>
+          </div>
+          <div class="stat-grid">
+            <div class="stat"><dt>Saldo Bintang</dt><dd id="profStars">0</dd></div>
+            <div class="stat"><dt>Proyek Dibuat</dt><dd id="profProjects">0</dd></div>
+            <div class="stat"><dt>Paket Hemat Terpakai</dt><dd id="profQuota">0 / 3</dd></div>
+            <div class="stat"><dt>Status Keanggotaan</dt><dd id="profStatus">Free</dd></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn primary wide" id="btnUpgrade"><i data-lucide="crown"></i> Upgrade ke Pro</button>
+            <button class="btn ghost small" id="btnReset"><i data-lucide="rotate-ccw"></i> Hapus Semua Data & Mulai Baru</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="eyebrow">Bantuan & Kontak Admin</div>
+          <ol class="steps">
+            <li><span class="step-num">1</span><span>Butuh paket atau kendala kode? Hubungi admin lewat WhatsApp.</span></li>
+            <li><span class="step-num">2</span><span>Klaim hadiah video juga dikirim ke nomor admin yang sama.</span></li>
+          </ol>
+          <div class="btn-row">
+            <button class="btn accent2" id="btnContactWa"><i data-lucide="message-circle"></i> Chat Admin WhatsApp</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <nav id="bottomnav">
+    <button class="nav-btn active" data-page="beranda"><i data-lucide="home"></i> Beranda</button>
+    <button class="nav-btn" data-page="riwayat"><i data-lucide="history"></i> Riwayat</button>
+    <button class="nav-btn" data-page="profil"><i data-lucide="user"></i> Profil</button>
+  </nav>
+</div>
+
+<div id="modalRoot"></div>
+<div id="toastRoot"></div>
+
+<script>
+/* ==================== 1. CORE STATE & HELPERS ==================== */
+(function(){
+  var KEY = 'nusawb_v1';
+  var S;
+  function defaults(){
+    return {
+      stars:50, newBonusClaimed:true, channelClaimed:false,
+      pro:false, proUntil:0, permanentOwned:false,
+      limitedUsed:0, usedCodes:[], history:[],
+      username:'', projectsMade:0, createdAt:Date.now()
+    };
+  }
+  function load(){
+    var raw=null;
+    try{ raw = localStorage.getItem(KEY); }catch(e){ raw=null; }
+    var d = defaults();
+    if(raw){
+      try{ S = JSON.parse(raw); }catch(e){ S=null; }
+      if(!S || typeof S!=='object' || Array.isArray(S)) S={};
+      Object.keys(d).forEach(function(k){
+        if(S[k]===undefined || S[k]===null) S[k]=d[k];
+      });
+    } else { S = d; save(); }
+    if(!Array.isArray(S.usedCodes)) S.usedCodes=[];
+    if(!Array.isArray(S.history)) S.history=[];
+  }
+  function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+  function resetAll(){ try{ localStorage.removeItem(KEY); }catch(e){} location.reload(); }
+
+  function toast(msg,type){
+    var root=document.getElementById('toastRoot');
+    var t=document.createElement('div');
+    t.className='toast '+(type||'');
+    t.textContent=msg;
+    root.appendChild(t);
+    setTimeout(function(){ t.style.opacity='0'; t.style.transition='opacity .3s'; setTimeout(function(){ t.remove(); },320); },2600);
+  }
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function starCoin(size){
+    size=size||18;
+    return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'+
+      '<rect x="2" y="2" width="36" height="36" rx="9" fill="#2a2a2f" stroke="#c47046" stroke-width="2.5"/>'+
+      '<rect x="9" y="9" width="22" height="22" rx="5" fill="#202024" stroke="#7ba8b8" stroke-width="1.5"/>'+
+      '<polygon points="20,13 22.2,18.1 27.7,18.5 23.5,22.2 24.8,27.6 20,24.6 15.2,27.6 16.5,22.2 12.3,18.5 17.8,18.1" fill="#facc15" stroke="#fde047" stroke-width="1" stroke-linejoin="round"/>'+
+    '</svg>';
+  }
+  function wa(text){ return 'https://wa.me/628217611734?text='+encodeURIComponent(text); }
+  function fmtDate(ts){
+    try{ return new Date(ts).toLocaleString('id-ID',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}); }
+    catch(e){ return ''+ts; }
+  }
+  function icons(){ if(window.lucide && typeof lucide.createIcons==='function'){ try{ lucide.createIcons(); }catch(e){} } }
+  function uid(){ return 'P'+Date.now().toString(36).toUpperCase()+Math.floor(Math.random()*90+10); }
+
+  window.NW = {
+    KEY:KEY, S:S, save:save, resetAll:resetAll, toast:toast, esc:esc,
+    starCoin:starCoin, wa:wa, fmtDate:fmtDate, icons:icons, uid:uid,
+    CODE_BOOK:[
+      {code:'NUSA-RIFAL-11-FREE50', stars:50,  tag:'Bonus Akun Baru'},
+      {code:'NUSA-RIFAL-28-KXQZ', stars:100, tag:'Paket Hemat 100 Bintang'},
+      {code:'NUSA-RIFAL-49-BVLT', stars:100, tag:'Paket Hemat 100 Bintang'},
+      {code:'NUSA-RIFAL-85-MPJW', stars:100, tag:'Paket Hemat 100 Bintang'},
+      {code:'NUSA-RIFAL-18-BNXY', stars:250, tag:'Paket Pro 250 Bintang'},
+      {code:'NUSA-RIFAL-43-KMZT', stars:250, tag:'Paket Pro 250 Bintang'},
+      {code:'NUSA-RIFAL-001-ELITE-A7KQ', stars:500, pro:true, permanent:true, tag:'Paket Permanen Elite'},
+      {code:'NUSA-RIFAL-002-ELITE-M3PW', stars:500, pro:true, permanent:true, tag:'Paket Permanen Elite'}
+    ]
+  };
+  load(); NW.S=S;
+})();
+</script>
+
+<script>
+/* ==================== 2. NAV, HEADER, PROFILE, HISTORY ==================== */
+(function(){
+  var NW=window.NW;
+
+  function isPro(){
+    var S=NW.S;
+    if(S.permanentOwned) return true;
+    if(S.pro && S.proUntil && Date.now() < S.proUntil) return true;
+    return false;
+  }
+  NW.isPro=isPro;
+
+  function renderHeader(){
+    document.getElementById('headerCoin').innerHTML = NW.starCoin(20)+'<span>'+NW.S.stars+'</span>';
+    var b=document.getElementById('headerBadge');
+    b.innerHTML = isPro()
+      ? '<span class="badge-pro gold"><i data-lucide="crown" style="width:13px;height:13px"></i>PRO</span>'
+      : '<span class="badge-pro free"><i data-lucide="user" style="width:13px;height:13px"></i>FREE</span>';
+    NW.icons();
+  }
+
+  function switchPage(name){
+    document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+    document.getElementById('page-'+name).classList.add('active');
+    document.querySelectorAll('.nav-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.page===name); });
+    if(name==='riwayat') renderHistory();
+    if(name==='profil') renderProfile();
+    if(name==='beranda') renderWallet();
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  document.querySelectorAll('.nav-btn').forEach(function(b){
+    b.addEventListener('click', function(){ switchPage(b.dataset.page); });
+  });
+  NW.switchPage=switchPage;
+
+  function renderGreet(){
+    var name=NW.S.username;
+    document.getElementById('greetName').textContent = name ? ('Halo, '+name) : 'Halo, Teman Kreator';
+  }
+
+  function renderProfile(){
+    var S=NW.S;
+    var initial=(name||'T').charAt(0).toUpperCase();
+    document.getElementById('profAvatar').textContent=initial;
+    document.getElementById('profName').value=S.username||'';
+    document.getElementById('profSince').textContent='Bergabung sejak '+NW.fmtDate(S.createdAt);
+    document.getElementById('profStars').textContent=S.stars;
+    document.getElementById('profProjects').textContent=S.projectsMade;
+    document.getElementById('profQuota').textContent=S.limitedUsed+' / 3';
+    var badge=document.getElementById('profBadge');
+    if(isPro()){
+      badge.innerHTML='<span class="badge-pro gold"><i data-lucide="crown" style="width:13px;height:13px"></i> Anggota PRO — fitur eksklusif aktif</span>';
+      document.getElementById('profStatus').textContent='PRO';
+    } else {
+      badge.innerHTML='<span class="badge-pro free"><i data-lucide="user" style="width:13px;height:13px"></i> Anggota FREE — upgrade untuk fitur Pro</span>';
+      document.getElementById('profStatus').textContent='Free';
+    }
+    NW.icons();
+  }
+
+  document.getElementById('profName').addEventListener('input', function(e){
+    NW.S.username=e.target.value.trim(); NW.save(); renderGreet();
+  });
+  document.getElementById('btnUpgrade').addEventListener('click', function(){
+    NW.switchPage('beranda');
+    setTimeout(function(){ document.getElementById('kredit').scrollIntoView({behavior:'smooth'}); }, 250);
+  });
+  document.getElementById('btnReset').addEventListener('click', function(){
+    if(confirm('Hapus semua data (bintang, riwayat, pengaturan) dan mulai dari awal?')) NW.resetAll();
+  });
+  document.getElementById('btnContactWa').addEventListener('click', function(){
+    window.open(NW.wa('Halo admin NusaWebGame, saya butuh bantuan terkait akun / paket.'),'_blank');
+  });
+
+  function renderHistory(){
+    var list=document.getElementById('historyList');
+    var items=NW.S.history.slice().reverse();
+    if(!items.length){
+      list.innerHTML='<div class="empty"><i data-lucide="folder-open"></i><div>Belum ada proyek.<br>Buat game atau aplikasi pertamamu dari halaman Beranda.</div></div>';
+      NW.icons(); return;
+    }
+    list.innerHTML='';
+    items.forEach(function(h){
+      var d=document.createElement('div');
+      d.className='hist-item';
+      d.innerHTML=
+        '<div class="hist-top">'+
+          '<div><div class="hist-title">'+NW.esc(h.title)+'</div>'+
+          '<div class="hist-meta"><span class="tag '+(h.mode==='coding'?'code':'ai')+'">'+(h.mode==='coding'?'Dengan Coding':'Tanpa Coding')+'</span>'+
+          '<span>'+NW.fmtDate(h.ts)+'</span><span>−'+h.cost+' Bintang</span></div></div>'+
+          '<button class="btn ghost small" data-del="'+h.id+'"><i data-lucide="x"></i></button>'+
+        '</div>'+
+        '<div class="hist-meta" style="margin-top:6px"><span class="result-link">'+NW.esc(h.link)+'</span></div>';
+      list.appendChild(d);
+    });
+    list.querySelectorAll('[data-del]').forEach(function(b){
+      b.addEventListener('click', function(){
+        NW.S.history=NW.S.history.filter(function(x){ return x.id!==b.dataset.del; });
+        NW.save(); renderHistory(); NW.toast('Proyek dihapus.');
+      });
+    });
+    NW.icons();
+  }
+  document.getElementById('btnClearHistory').addEventListener('click', function(){
+    if(!NW.S.history.length){ NW.toast('Riwayat sudah kosong.'); return; }
+    if(confirm('Hapus seluruh riwayat proyek?')){ NW.S.history=[]; NW.save(); renderHistory(); NW.toast('Riwayat dibersihkan.'); }
+  });
+
+  NW.renderHeader=renderHeader; NW.renderProfile=renderProfile; NW.renderHistory=renderHistory; NW.renderGreet=renderGreet;
+})();
+</script>
+
+<script>
+/* ==================== 3. GENERATOR TANPA CODING ==================== */
+(function(){
+  var NW=window.NW;
+  var state='idle';           // idle | running | done
+  var timers=[];
+  var diff='simple', theme='#2563ab', lastResult=null;
+
+  var EST={simple:'Perkiraan waktu tunggu: 1–3 menit', medium:'Perkiraan waktu tunggu: 3–7 menit', complex:'Perkiraan waktu tunggu: 7–15 menit'};
+  var DUR={simple:2400, medium:3600, complex:5000};
+
+  document.querySelectorAll('#diffChips .chip').forEach(function(c){
+    c.addEventListener('click', function(){
+      document.querySelectorAll('#diffChips .chip').forEach(function(x){x.classList.remove('active');});
+      c.classList.add('active'); diff=c.dataset.diff;
+      document.getElementById('genEstimate').textContent=EST[diff];
+    });
+  });
+  document.querySelectorAll('#themeSwatches .swatch').forEach(function(s){
+    s.addEventListener('click', function(){
+      document.querySelectorAll('#themeSwatches .swatch').forEach(function(x){x.classList.remove('active');});
+      s.classList.add('active'); theme=s.dataset.theme;
+    });
+  });
+
+  function starterDoc(title,color){
+    var t=NW.esc(title||'Proyek NusaWebGame');
+    return '<!DOCTYPE html><html lang="id"><head><meta charset="utf-8">'+
+      '<meta name="viewport" content="width=device-width,initial-scale=1">'+
+      '<title>'+t+'</title><style>'+
+      'body{margin:0;min-height:100vh;display:grid;place-items:center;text-align:center;font-family:sans-serif;background:'+color+';color:#fff;padding:24px}'+
+      'h1{font-size:1.8rem;margin:0 0 10px}p{opacity:.85}</style></head>'+
+      '<body><div><h1>'+t+'</h1><p>Dibuat dengan NusaWebGame oleh RIFAL MODS</p></div></body></html>';
+  }
+
+  function downloadFile(name, content, type){
+    var blob=new Blob([content],{type:type||'text/html;charset=utf-8'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a'); a.href=url; a.download=name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){URL.revokeObjectURL(url);},800);
+  }
+
+  function resetTimers(){ timers.forEach(function(t){ clearInterval(t); clearTimeout(t); }); timers=[]; }
+
+  document.getElementById('btnGenerate').addEventListener('click', function(){
+    if(state!=='idle') return;
+    var desc=document.getElementById('descInput').value.trim();
+    if(!desc){ NW.toast('Tuliskan dulu deskripsi game / aplikasi yang kamu mau.','err'); return; }
+    if(NW.S.stars<15){ NW.toast('Bintang kurang. Butuh 15 Bintang untuk membuat.','err'); return; }
+    state='running';
+    var btn=document.getElementById('btnGenerate'); btn.disabled=true;
+    document.getElementById('genProgress').classList.remove('hidden');
+    document.getElementById('genResult').classList.add('hidden');
+    document.getElementById('genEstimate').textContent=EST[diff];
+    document.getElementById('genStatus').textContent='AI sedang menyusun struktur kode...';
+    var bar=document.getElementById('genBar'), pct=document.getElementById('genPct');
+    var start=Date.now(), dur=DUR[diff];
+    var phase=0;
+    var iv=setInterval(function(){
+      var p=Math.min(1,(Date.now()-start)/dur);
+      bar.style.width=(p*100).toFixed(0)+'%';
+      pct.textContent=(p*100).toFixed(0)+'%';
+      var msgs=['AI sedang menyusun struktur kode...','Menulis elemen antarmuka...','Menambahkan logika permainan...','Menguji dan merapikan tampilan...'];
+      var idx=Math.min(msgs.length-1, Math.floor(p*msgs.length));
+      document.getElementById('genStatus').textContent=msgs[idx];
+      if(p>=1){
+        clearInterval(iv);
+        // commit hanya di selesai (C2)
+        NW.S.stars-=15;
+        NW.S.projectsMade+=1;
+        var id=NW.uid();
+        var title=desc.split('\n')[0].slice(0,42)||'Proyek Baru';
+        var link='https://nusawebgame.vercel.app/proyek/'+id.toLowerCase();
+        lastResult={id:id,title:title,link:link,doc:starterDoc(title,theme)};
+        NW.S.history.push({id:id,title:title,mode:'ai',cost:15,ts:Date.now(),link:link});
+        NW.save();
+        state='done';
+        btn.disabled=false;
+        document.getElementById('genStatus').textContent='Selesai! Proyek kamu siap dibuka.';
+        document.getElementById('genLink').textContent=link;
+        document.getElementById('genResult').classList.remove('hidden');
+        NW.renderHeader(); renderWalletBalance();
+        NW.toast('Selesai! 15 Bintang terpotong, proyek tersimpan di Riwayat.','ok');
+      }
+    },90);
+    timers.push(iv);
+  });
+
+  function renderWalletBalance(){
+    var S=NW.S;
+    var el=document.getElementById('walletStars'); if(el) el.textContent=S.stars;
+    var st=document.getElementById('walletStatus');
+    if(st) st.textContent = NW.isPro() ? 'Status: PRO — fitur eksklusif aktif' : 'Status: FREE — 15 Bintang untuk 1 kali pembuatan';
+  }
+  NW.renderWalletBalance=renderWalletBalance;
+
+  document.getElementById('btnGenDownload').addEventListener('click', function(){
+    if(!lastResult) return;
+    downloadFile(lastResult.id.toLowerCase()+'.html', lastResult.doc);
+    NW.toast('File proyek diunduh.','ok');
+  });
+  document.getElementById('btnGenShare').addEventListener('click', function(){
+    if(!lastResult) return;
+    var text='Lihat proyek saya di NusaWebGame: '+lastResult.link;
+    if(navigator.share){ navigator.share({title:'Proyek NusaWebGame',text:text,url:lastResult.link}).catch(function(){}); }
+    else if(navigator.clipboard){ navigator.clipboard.writeText(lastResult.link).then(function(){NW.toast('Link disalin ke papan klip.','ok');}); }
+    else NW.toast(lastResult.link);
+  });
+  document.getElementById('btnGenNew').addEventListener('click', function(){
+    state='idle';
+    document.getElementById('descInput').value='';
+    document.getElementById('genProgress').classList.add('hidden');
+    document.getElementById('genResult').classList.add('hidden');
+    document.getElementById('genBar').style.width='0%';
+    document.getElementById('genPct').textContent='0%';
+  });
+})();
+</script>
+
+<script>
+/* ==================== 4. EDITOR DENGAN CODING ==================== */
+(function(){
+  var NW=window.NW;
+  var state='idle';
+  var starter='<!DOCTYPE html>\n<html lang="id">\n<head>\n<meta charset="UTF-8">\n<title>Proyek Saya</title>\n<style>\nbody{margin:0;min-height:100vh;display:grid;place-items:center;font-family:sans-serif;background:#202024;color:#e8e5df}\nh1{font-size:2rem}\n</style>\n</head>\n<body>\n<h1>Halo, Dunia!</h1>\n</body>\n</html>';
+  var editor=document.getElementById('codeEditor');
+  editor.value=starter;
+
+  function status(msg,cls){
+    var el=document.getElementById('codeStatus');
+    el.textContent=msg; el.className='code-status '+(cls||'');
+  }
+  document.getElementById('btnPreview').addEventListener('click', function(){
+    var iframe=document.getElementById('codePreview');
+    iframe.srcdoc=editor.value;
+    status('Pratinjau diperbarui.','ok');
+  });
+  document.getElementById('btnCopy').addEventListener('click', function(){
+    if(navigator.clipboard){ navigator.clipboard.writeText(editor.value).then(function(){status('Seluruh kode disalin.','ok');}); }
+    else status('Salin manual: blok semua teks di editor.');
+  });
+  document.getElementById('btnCheck').addEventListener('click', function(){
+    var c=editor.value, issues=[];
+    if(!/<!DOCTYPE html>/i.test(c)) issues.push('deklarasi DOCTYPE belum ada');
+    if(!/<html[\s>]/i.test(c)) issues.push('tag <html> belum ada');
+    if(!/<\/html>/i.test(c)) issues.push('penutup </html> belum ada');
+    var open=(c.match(/{/g)||[]).length, close=(c.match(/}/g)||[]).length;
+    if(open!==close) issues.push('kurung kurawal tidak seimbang ('+open+' buka vs '+close+' tutup)');
+    var po=(c.match(/\(/g)||[]).length, pc=(c.match(/\)/g)||[]).length;
+    if(po!==pc) issues.push('kurung biasa tidak seimbang ('+po+' buka vs '+pc+' tutup)');
+    if(!issues.length) status('Kode tampil seimbang dan siap dipratinjau.','ok');
+    else status('Perlu dicek: '+issues.join('; ')+'.','warn');
+  });
+  document.getElementById('btnUpload').addEventListener('click', function(){
+    document.getElementById('fileInput').click();
+  });
+  document.getElementById('fileInput').addEventListener('change', function(e){
+    var f=e.target.files && e.target.files[0]; if(!f) return;
+    var rd=new FileReader();
+    rd.onload=function(){ editor.value=String(rd.result); status('File "'+f.name+'" dimasukkan ke editor.','ok'); };
+    rd.readAsText(f);
+  });
+  document.getElementById('btnDeploy').addEventListener('click', function(){
+    if(state!=='idle') return;
+    var code=editor.value.trim();
+    if(!code){ NW.toast('Editor masih kosong.','err'); return; }
+    if(NW.S.stars<15){ NW.toast('Bintang kurang. Butuh 15 Bintang untuk menerbitkan.','err'); return; }
+    state='running';
+    var btn=document.getElementById('btnDeploy'); btn.disabled=true;
+    status('Menerbitkan proyek...');
+    setTimeout(function(){
+      NW.S.stars-=15; NW.S.projectsMade+=1;
+      var id=NW.uid();
+      var link='https://nusawebgame.vercel.app/proyek/'+id.toLowerCase();
+      var title='Proyek Kode '+id;
+      NW.S.history.push({id:id,title:title,mode:'coding',cost:15,ts:Date.now(),link:link});
+      NW.save();
+      var blob=new Blob([code],{type:'text/html;charset=utf-8'});
+      var url=URL.createObjectURL(blob);
+      var a=document.createElement('a'); a.href=url; a.download=id.toLowerCase()+'.html';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function(){URL.revokeObjectURL(url);},800);
+      state='idle'; btn.disabled=false;
+      status('Terbit! File diunduh dan proyek tersimpan di Riwayat. Link: '+link,'ok');
+      NW.renderHeader(); NW.renderWalletBalance();
+      NW.toast('15 Bintang terpotong — proyek kode diterbitkan.','ok');
+    },900);
+  });
+})();
+</script>
+
+<script>
+/* ==================== 5. WALLET, PAKET, REDEEM, KLAIM ==================== */
+(function(){
+  var NW=window.NW;
+
+  var PACKAGES=[
+    {id:'hemat', name:'Paket Hemat Terbatas', icon:'flame', stars:100, price:'Rp 45.000',
+     note:'Paket termurah. Maksimal dibeli 3 kali per akun. Setelah kuota habis, paket ini hilang.',
+     quota:true, featured:false, wa:'Halo admin, saya mau beli Paket Hemat 100 Bintang seharga Rp 45.000. Nama akun: '},
+    {id:'pro30', name:'Paket Pro 30 Hari', icon:'crown', stars:250, price:'Rp 90.000',
+     note:'250 Bintang + status Pro aktif 30 hari penuh dengan fitur eksklusif.',
+     quota:false, featured:false, wa:'Halo admin, saya mau beli Paket Pro 30 Hari (250 Bintang) seharga Rp 90.000. Nama akun: '},
+    {id:'elite', name:'Paket Permanen Elite', icon:'gem', stars:500, price:'Rp 250.000',
+     note:'500 Bintang + status Pro selamanya, tidak pernah kadaluarsa. Pilihan paling bernilai.',
+     quota:false, featured:true, wa:'Halo admin, saya mau beli Paket Permanen Elite (500 Bintang + Pro selamanya) seharga Rp 250.000. Nama akun: '}
+  ];
+
+  function renderPackages(){
+    var grid=document.getElementById('pkgGrid');
+    grid.innerHTML='';
+    PACKAGES.forEach(function(p){
+      var used = p.quota ? NW.S.limitedUsed : 0;
+      var maxed = p.quota && used>=3;
+      var card=document.createElement('div');
+      card.className='pkg'+(p.featured?' featured':'');
+      var badge = p.featured ? '<span class="flag">TERBAIK</span>' : (p.quota ? '<span class="flag">TERBATAS</span>' : '');
+      var quotaHtml = p.quota
+        ? '<div class="pkg-quota '+(maxed?'done':'')+'">Kuota kamu: '+used+' / 3 '+(maxed?'— habis, tidak bisa dibeli lagi':'— tersisa '+(3-used)+' kali')+'</div>'
+        : '';
+      card.innerHTML=badge+
+        '<div class="pkg-name"><i data-lucide="'+p.icon+'" style="width:18px;height:18px"></i>'+p.name+'</div>'+
+        '<div class="pkg-stars">'+p.stars+' Bintang</div>'+
+        '<div class="pkg-price">'+p.price+'</div>'+
+        '<div class="pkg-note">'+p.note+'</div>'+
+        quotaHtml+
+        '<div class="btn-row"><button class="btn '+(maxed?'ghost':'primary')+' small" '+(maxed?'disabled':'')+' data-buy="'+p.id+'">'+
+        (maxed?'Kuota Habis':'<i data-lucide="shopping-cart"></i> Beli via WhatsApp')+'</button></div>';
+      grid.appendChild(card);
+    });
+    grid.querySelectorAll('[data-buy]').forEach(function(b){
+      b.addEventListener('click', function(){
+        var p=PACKAGES.find(function(x){return x.id===b.dataset.buy;});
+        window.open(NW.wa(p.wa+(NW.S.username||'(belum diisi)')),'_blank');
+      });
+    });
+    NW.icons();
+  }
+
+  function renderWallet(){
+    NW.renderHeader();
+    var S=NW.S;
+    var w=document.getElementById('walletStars'); if(w) w.textContent=S.stars;
+    var st=document.getElementById('walletStatus');
+    if(st) st.textContent = NW.isPro() ? 'Status: PRO aktif' : 'Status: FREE · 15 Bintang untuk 1 kali pembuatan';
+    renderPackages();
+  }
+  NW.renderWallet=renderWallet;
+
+  document.getElementById('btnChannelClaim').addEventListener('click', function(){
+    if(NW.S.channelClaimed){ NW.toast('Klaim saluran resmi sudah diambil sebelumnya.','err'); return; }
+    if(!confirm('Klaim 15 Bintang gratis?\n\nSyarat: ikuti saluran resmi NusaWebGame terlebih dahulu (salin tautan saluran dari admin).')) return;
+    NW.S.channelClaimed=true; NW.S.stars+=15; NW.save();
+    renderWallet(); NW.toast('Selamat, 15 Bintang ditambahkan!','ok');
+  });
+
+  document.getElementById('btnVideo1k').addEventListener('click', function(){
+    window.open(NW.wa('Halo admin, saya klaim hadiah video 1.000 Views. Berikut tangkapan layar jumlah views. Nama akun: '+(NW.S.username||'-')),'_blank');
+  });
+  document.getElementById('btnVideo15k').addEventListener('click', function(){
+    window.open(NW.wa('Halo admin, saya klaim hadiah video 1.500 Views. Berikut tangkapan layar jumlah views. Nama akun: '+(NW.S.username||'-')),'_blank');
+  });
+
+  document.getElementById('btnRedeem').addEventListener('click', function(){
+    var raw=document.getElementById('codeInput').value.trim().toUpperCase();
+    if(!raw){ NW.toast('Masukkan kode dulu.','err'); return; }
+    if(NW.S.usedCodes.indexOf(raw)!==-1){ NW.toast('Kode ini sudah dipakai di akun ini.','err'); return; }
+    var found=NW.CODE_BOOK.find(function(c){ return c.code===raw; });
+    if(!found){ NW.toast('Kode tidak ditemukan. Periksa kembali penulisannya.','err'); return; }
+    NW.S.usedCodes.push(raw);
+    NW.S.stars+=found.stars;
+    if(found.pro){ NW.S.pro=true; NW.S.permanentOwned=!!found.permanent; if(!found.permanent){ NW.S.proUntil=Date.now()+30*24*3600*1000; } }
+    if(found.id==='hemat'){ /* pembelian hemat dicatat lewat admin; kode 100 bintang tidak menambah kuota */ }
+    NW.save();
+    document.getElementById('codeInput').value='';
+    renderWallet(); NW.renderHeader();
+    NW.toast('Berhasil! +'+found.stars+' Bintang'+(found.pro?' · Status PRO aktif':'')+'.','ok');
+  });
+})();
+</script>
+
+<script>
+/* ==================== 6. GAME GALERI + GAME PLAYABLE ==================== */
+(function(){
+  var NW=window.NW;
+  var GAMES=[
+    {id:'ttt', name:'Tic Tac Toe', meta:'2 Pemain', icon:'grid-3x3', playable:true, desc:'Pasang X dan O; tiga simbol berurutan menang.'},
+    {id:'dadu', name:'Lempar Dadu', meta:'1–6 Pemain', icon:'dices', playable:true, desc:'Lempar dadu lawan komputer; angka tertinggi menang.'},
+    {id:'memori', name:'Memori Kartu', meta:'1–4 Pemain', icon:'layers', playable:true, desc:'Buka kartu dan cari semua pasangannya sesegera mungkin.'},
+    {id:'ular', name:'Pelari Ular', meta:'1 Pemain', icon:'snail', playable:true, desc:'Makan makanan, tumbuh panjang, jangan tabrak dinding atau badan sendiri.'},
+    {id:'catur', name:'Catur Klasik', meta:'2 Pemain', icon:'shield', playable:false, desc:'Catur klasik lengkap, siap dimainkan lawan teman.'},
+    {id:'ular-tangga', name:'Ular Tangga', meta:'2–4 Pemain', icon:'ladder', playable:false, desc:'Lempar dadu, naik tangga, hati-hati jatuh ke ekor ular.'},
+    {id:'blackjack', name:'Kartu Blackjack', meta:'1–4 Pemain', icon:'spade', playable:false, desc:'Dekati angka 21 tanpa melebihi dari nilai bandar.'},
+    {id:'remi', name:'Kartu Remi Dasar', meta:'2–4 Pemain', icon:'shuffle', playable:false, desc:'Kumpulkan pasangan dan susunan kartu sebelum lawan.'},
+    {id:'kartu5', name:'Kartu 5 Orang', meta:'2–5 Pemain', icon:'users', playable:false, desc:'Permainan kartu grup sampai lima pemain sekaligus.'},
+    {id:'panah', name:'Pemanah Buah', meta:'1 Pemain', icon:'target', playable:false, desc:'Tembak buah yang melayang di udara tanpa kena rintangan.'},
+    {id:'lari', name:'Pelari Tanpa Henti', meta:'1 Pemain', icon:'footprints', playable:false, desc:'Lari terus, lompat rintangan, kecepatan makin meningkat.'},
+    {id:'bangun', name:'Bangun Rumah', meta:'1 Pemain', icon:'home', playable:false, desc:'Kumpulkan bahan dan bangun rumah impian selangkah demi selangkah.'}
+  ];
+  var SAMPLE='<!-- Contoh struktur game bawaan -->\n<div class="papan">Kartu permainan contoh</div>\n<style>\n.papan{padding:16px;border-radius:12px;background:#2a2a2f;color:#e8e5df}\n</style>\n<script>\n// Logika permainan ditempatkan di sini\n<\/script>';
+
+  var snDir={x:1,y:0};
+  document.addEventListener('keydown',function(e){
+    if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].indexOf(e.key)===-1) return;
+    if(!document.getElementById('snCanvas')) return;
+    if(e.key==='ArrowUp'&&snDir.y!==1) snDir={x:0,y:-1};
+    if(e.key==='ArrowDown'&&snDir.y!==-1) snDir={x:0,y:1};
+    if(e.key==='ArrowLeft'&&snDir.x!==1) snDir={x:-1,y:0};
+    if(e.key==='ArrowRight'&&snDir.x!==-1) snDir={x:1,y:0};
+    e.preventDefault();
+  });
+
+  function renderGames(){
+    var grid=document.getElementById('gameGrid'); grid.innerHTML='';
+    GAMES.forEach(function(g){
+      var c=document.createElement('div');
+      c.className='game-card';
+      c.innerHTML=
+        '<div class="g-icon"><i data-lucide="'+g.icon+'"></i></div>'+
+        '<div class="g-name">'+g.name+'</div>'+
+        '<div class="g-desc">'+g.desc+'</div>'+
+        '<div class="g-meta">'+g.meta+'</div>'+
+        '<div class="game-actions">'+
+          (g.playable
+            ? '<button class="btn primary small" data-play="'+g.id+'"><i data-lucide="play"></i> Mainkan</button>'
+            : '<button class="btn secondary small" data-file="'+g.id+'"><i data-lucide="file-code-2"></i> Lihat File</button>')+
+        '</div>';
+      grid.appendChild(c);
+    });
+    grid.querySelectorAll('[data-play]').forEach(function(b){ b.addEventListener('click',function(){ openGame(b.dataset.play); }); });
+    grid.querySelectorAll('[data-file]').forEach(function(b){ b.addEventListener('click',function(){ openSample(b.dataset.file); }); });
+    NW.icons();
+  }
+
+  function closeModal(){ document.getElementById('modalRoot').innerHTML=''; }
+  function modalShell(title, icon, inner){
+    document.getElementById('modalRoot').innerHTML=
+      '<div class="modal" id="gameModal">'+
+        '<div class="modal-box">'+
+          '<div class="modal-head"><h3><i data-lucide="'+icon+'"></i>'+title+'</h3>'+
+          '<button class="modal-close" id="modalClose"><i data-lucide="x"></i></button></div>'+
+          inner+
+        '</div>'+
+      '</div>';
+    document.getElementById('modalClose').addEventListener('click', closeModal);
+    document.getElementById('gameModal').addEventListener('click', function(e){ if(e.target.id==='gameModal') closeModal(); });
+    NW.icons();
+  }
+
+  function openSample(id){
+    var g=GAMES.find(function(x){return x.id===id;});
+    modalShell(g.name,'file-code-2',
+      '<p style="font-size:.84rem;color:var(--muted);line-height:1.55;margin-bottom:12px">'+g.desc+'</p>'+
+      '<p style="font-size:.78rem;color:var(--gold);margin-bottom:10px">Game ini segera hadir. Kamu juga bisa memintanya langsung lewat tombol Buat dengan AI (15 Bintang).</p>'+
+      '<pre class="code-sample">'+NW.esc(SAMPLE)+'</pre>');
+  }
+
+  function openGame(id){
+    if(id==='ttt') ttt();
+    else if(id==='dadu') dadu();
+    else if(id==='memori') memori();
+    else if(id==='ular') ular();
+  }
+
+  /* ---------- Tic Tac Toe ---------- */
+  function ttt(){
+    var board=Array(9).fill(''), turn='X', over=false;
+    modalShell('Tic Tac Toe','grid-3x3',
+      '<div class="game-stage">'+
+        '<div class="game-hud"><span>Giliran: <b id="tttTurn">X</b></span><span>X: <b id="tttX">0</b></span><span>O: <b id="tttO">0</b></span></div>'+
+        '<div class="ttt-board" id="tttBoard"></div>'+
+        '<div id="tttMsg" style="font-size:.84rem;color:var(--muted)"></div>'+
+        '<button class="btn secondary small" id="tttReset"><i data-lucide="rotate-ccw"></i> Main Ulang</button>'+
+      '</div>');
+    var wins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+    var scores={X:0,O:0};
+    var boardEl=document.getElementById('tttBoard');
+    function render(){
+      boardEl.innerHTML='';
+      board.forEach(function(v,i){
+        var b=document.createElement('button');
+        b.className='ttt-cell'; b.textContent=v;
+        if(v && wins.some(function(w){ return w.indexOf(i)>=0 && w.every(function(j){return board[j]===v;}); })) b.classList.add('win');
+        b.addEventListener('click',function(){ move(i); });
+        boardEl.appendChild(b);
+      });
+      document.getElementById('tttTurn').textContent=turn;
+    }
+    function move(i){
+      if(over||board[i]) return;
+      board[i]=turn;
+      var line=wins.find(function(w){return w.every(function(j){return board[j]===turn;});});
+      if(line){ over=true; scores[turn]++; document.getElementById(turn==='X'?'tttX':'tttO').textContent=scores[turn];
+        document.getElementById('tttMsg').textContent='Pemenang: '+turn+'!'; render(); return; }
+      if(board.every(Boolean)){ over=true; document.getElementById('tttMsg').textContent='Seri, tidak ada pemenang.'; render(); return; }
+      turn = turn==='X'?'O':'X'; render();
+    }
+    document.getElementById('tttReset').addEventListener('click',function(){ board=Array(9).fill(''); turn='X'; over=false; document.getElementById('tttMsg').textContent=''; render(); });
+    render(); NW.icons();
+  }
+
+  /* ---------- Dadu ---------- */
+  function dadu(){
+    var p=0,c=0,busy=false;
+    modalShell('Lempar Dadu','dices',
+      '<div class="game-stage">'+
+        '<div class="game-hud"><span>Kamu: <b id="dP">0</b></span><span>Komputer: <b id="dC">0</b></span></div>'+
+        '<div class="dice-row"><div><div style="font-size:.74rem;color:var(--muted);margin-bottom:6px;text-align:center">Kamu</div><div class="dice" id="diceP">–</div></div>'+
+        '<div><div style="font-size:.74rem;color:var(--muted);margin-bottom:6px;text-align:center">Komputer</div><div class="dice" id="diceC">–</div></div></div>'+
+        '<div id="daduMsg" style="font-size:.84rem;color:var(--muted)">Tekan tombol untuk melempar.</div>'+
+        '<button class="btn primary" id="daduRoll"><i data-lucide="dices"></i> Lempar Dadu</button>'+
+      '</div>');
+    document.getElementById('daduRoll').addEventListener('click',function(){
+      if(busy) return; busy=true;
+      var dp=document.getElementById('diceP'), dc=document.getElementById('diceC');
+      dp.classList.add('rolling'); dc.classList.add('rolling');
+      var ticks=0; var iv=setInterval(function(){
+        dp.textContent=Math.floor(Math.random()*6)+1;
+        dc.textContent=Math.floor(Math.random()*6)+1;
+        if(++ticks>=8){
+          clearInterval(iv);
+          var pv=Math.floor(Math.random()*6)+1, cv=Math.floor(Math.random()*6)+1;
+          dp.textContent=pv; dc.textContent=cv;
+          dp.classList.remove('rolling'); dc.classList.remove('rolling');
+          var msg;
+          if(pv>cv){p++; msg='Kamu menang ronde ini ('+pv+' vs '+cv+').';}
+          else if(pv<cv){c++; msg='Komputer menang ronde ini ('+cv+' vs '+pv+').';}
+          else msg='Seri di ronde ini ('+pv+' sama '+cv+').';
+          document.getElementById('dP').textContent=p; document.getElementById('dC').textContent=c;
+          document.getElementById('daduMsg').textContent=msg;
+          busy=false;
+        }
+      },70);
+    });
+    NW.icons();
+  }
+
+  /* ---------- Memori Kartu ---------- */
+  function memori(){
+    var letters=['A','B','C','D','E','F'];
+    var deck, first=null, lock=false, matched=0, moves=0;
+    function build(){
+      deck=letters.concat(letters).map(function(l,i){ return {l:l, k:i}; });
+      for(var i=deck.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=deck[i]; deck[i]=deck[j]; deck[j]=t; }
+    }
+    build();
+    modalShell('Memori Kartu','layers',
+      '<div class="game-stage">'+
+        '<div class="game-hud"><span>Pasangan: <b id="mMatch">0 / 6</b></span><span>Langkah: <b id="mMoves">0</b></span></div>'+
+        '<div class="mem-grid" id="memGrid"></div>'+
+        '<button class="btn secondary small" id="memReset"><i data-lucide="rotate-ccw"></i> Acak Ulang</button>'+
+      '</div>');
+    var grid=document.getElementById('memGrid');
+    function render(){
+      grid.innerHTML='';
+      deck.forEach(function(card,idx){
+        var b=document.createElement('button');
+        b.className='mem-card'; b.dataset.idx=idx; b.textContent=card.l;
+        b.addEventListener('click',function(){ flip(idx,b); });
+        grid.appendChild(b);
+      });
+    }
+    function flip(idx,btn){
+      if(lock||btn.classList.contains('flipped')||btn.classList.contains('matched')) return;
+      btn.classList.add('flipped');
+      if(!first){ first={idx:idx,btn:btn}; return; }
+      moves++; document.getElementById('mMoves').textContent=moves;
+      if(deck[first.idx].l===deck[idx].l){
+        first.btn.classList.add('matched'); btn.classList.add('matched');
+        matched++; document.getElementById('mMatch').textContent=matched+' / 6';
+        first=null;
+        if(matched===6){ document.getElementById('mMoves').textContent=moves+' — selesai!'; }
+      } else {
+        lock=true; var f=first.btn;
+        setTimeout(function(){ f.classList.remove('flipped'); btn.classList.remove('flipped'); lock=false; },650);
+      }
+      first=null;
+    }
+    document.getElementById('memReset').addEventListener('click',function(){
+      build(); first=null; lock=false; matched=0; moves=0;
+      document.getElementById('mMatch').textContent='0 / 6'; document.getElementById('mMoves').textContent='0'; render();
+    });
+    render(); NW.icons();
+  }
+
+  /* ---------- Snake ---------- */
+  function ular(){
+    modalShell('Pelari Ular','snail',
+      '<div class="game-stage">'+
+        '<div class="game-hud"><span>Skor: <b id="snScore">0</b></span><span>Terbaik: <b id="snBest">0</b></span></div>'+
+        '<canvas id="snCanvas" width="260" height="260"></canvas>'+
+        '<div id="snMsg" style="font-size:.82rem;color:var(--muted)">Tekan Mulai, lalu gunakan tombol arah.</div>'+
+        '<div class="dpad">'+
+          '<span></span><button data-dir="up"><i data-lucide="chevron-up"></i></button><span></span>'+
+          '<button data-dir="left"><i data-lucide="chevron-left"></i></button><button data-dir="down"><i data-lucide="chevron-down"></i></button><button data-dir="right"><i data-lucide="chevron-right"></i></button>'+
+        '</div>'+
+        '<button class="btn primary" id="snStart"><i data-lucide="play"></i> Mulai Main</button>'+
+      '</div>');
+    var cv=document.getElementById('snCanvas'), ctx=cv.getContext('2d');
+    var CELL=20, COLS=13, ROWS=13, timer=null, state='start';
+    var snake, food, score, best=0;
+    function reset(){
+      snake=[{x:6,y:6},{x:5,y:6},{x:4,y:6}]; snDir={x:1,y:0}; score=0;
+      food={x:10,y:10}; document.getElementById('snScore').textContent='0';
+    }
+    function draw(){
+      ctx.fillStyle='#202024'; ctx.fillRect(0,0,260,260);
+      ctx.fillStyle='#facc15'; ctx.beginPath(); ctx.arc(food.x*CELL+10,food.y*CELL+10,7,0,Math.PI*2); ctx.fill();
+      snake.forEach(function(s,i){
+        ctx.fillStyle = i===0 ? '#7ba8b8' : '#c47046';
+        ctx.fillRect(s.x*CELL+1,s.y*CELL+1,18,18);
+      });
+    }
+    function step(){
+      var head={x:snake[0].x+snDir.x, y:snake[0].y+snDir.y};
+      if(head.x<0||head.y<0||head.x>=COLS||head.y>=ROWS||snake.some(function(s){return s.x===head.x&&s.y===head.y;})){
+        clearInterval(timer); timer=null; state='ended';
+        document.getElementById('snMsg').textContent='Permainan berakhir. Skor akhir: '+score+'. Tekan Mulai Main untuk coba lagi.';
+        if(score>best){best=score; document.getElementById('snBest').textContent=best;}
+        return;
+      }
+      snake.unshift(head);
+      if(head.x===food.x&&head.y===food.y){
+        score++; document.getElementById('snScore').textContent=score;
+        food={x:Math.floor(Math.random()*COLS), y:Math.floor(Math.random()*ROWS)};
+      } else snake.pop();
+      draw();
+    }
+    function start(){
+      reset(); state='playing'; draw();
+      document.getElementById('snMsg').textContent='Makan makanan kuning. Jangan kena dinding.';
+      clearInterval(timer); timer=setInterval(step,150);
+    }
+    document.getElementById('snStart').addEventListener('click',start);
+    document.querySelectorAll('.dpad [data-dir]').forEach(function(b){
+      b.addEventListener('click',function(){
+        var d=b.dataset.dir;
+        if(d==='up'&&snDir.y!==1) snDir={x:0,y:-1};
+        if(d==='down'&&snDir.y!==-1) snDir={x:0,y:1};
+        if(d==='left'&&snDir.x!==1) snDir={x:-1,y:0};
+        if(d==='right'&&snDir.x!==-1) snDir={x:1,y:0};
+      });
+    });
+    reset(); draw(); NW.icons();
+  }
+
+  NW.renderGames=renderGames;
+})();
+</script>
+
+<script>
+/* ==================== 7. INTRO LOADER + BOOT ==================== */
+(function(){
+  var full='Welcome to NusaWebGame';
+  var titleEl=document.getElementById('introTitle');
+  var bar=document.getElementById('introBar'), pct=document.getElementById('introPct');
+  var hidden=false;
+  function hideIntro(){
+    if(hidden) return; hidden=true;
+    var intro=document.getElementById('intro');
+    intro.classList.add('done');
+    document.getElementById('app').classList.remove('app-hidden');
+    setTimeout(function(){ intro.style.display='none'; },480);
+    window.NW.renderHeader(); window.NW.renderGreet(); window.NW.renderWallet(); window.NW.renderGames();
+    window.NW.icons();
+  }
+  // mengetik judul
+  var i=0;
+  var dots='<span class="dots"><span>.</span><span>.</span><span>.</span></span>';
+  var typeIv=setInterval(function(){
+    i++; titleEl.innerHTML=full.slice(0,i)+dots;
+    if(i>=full.length){ clearInterval(typeIv); }
+  },95);
+  // progress
+  var start=Date.now(), dur=2600;
+  var progIv=setInterval(function(){
+    var p=Math.min(1,(Date.now()-start)/dur);
+    bar.style.width=(p*100).toFixed(0)+'%';
+    pct.textContent=(p*100).toFixed(0)+'%';
+    if(p>=1){ clearInterval(progIv); setTimeout(hideIntro,250); }
+  },80);
+  // backstop maksimal 5 detik (pengalaman: loader tidak boleh nyangkut)
+  setTimeout(hideIntro,5000);
+})();
+</script>
+</body>
+</html>
